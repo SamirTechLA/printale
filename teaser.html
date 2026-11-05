@@ -12,20 +12,19 @@
       :root { --ink:#122d50; --coral:#f77968; --paper:#fff9ed; --gold:#f5b841; --line:#eadcc4; }
       * { box-sizing:border-box; } body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(circle at 82% 7%,#fff0c4 0,transparent 25rem),var(--paper); font-family:"DM Sans",sans-serif; }
       .top { background:var(--ink); color:#fff6db; text-align:center; padding:10px 24px; font-size:14px; } main { width:min(1120px,calc(100% - 48px)); margin:0 auto; }
-      header { display:flex; align-items:center; justify-content:space-between; padding:25px 0; } .logo { width:240px; height:84px; object-fit:contain; object-position:left center; } .status { color:#337f75; font-size:14px; font-weight:700; }
+      header { display:flex; align-items:center; justify-content:space-between; padding:18px 0; } .logo-crop { width:310px; height:142px; overflow:hidden; position:relative; } .logo { position:absolute; width:432px; max-width:none; left:-61px; top:-22px; } .status { color:#337f75; font-size:14px; font-weight:700; }
       .hero { display:grid; grid-template-columns:1.04fr .96fr; align-items:center; gap:64px; padding:70px 0 82px; } .eyebrow { color:#558a9d; letter-spacing:.18em; text-transform:uppercase; font-size:12px; font-weight:700; }
       h1 { font-family:Fraunces,serif; font-size:clamp(48px,6vw,76px); line-height:.98; letter-spacing:-.055em; margin:18px 0 24px; } h1 em { color:var(--coral); } p { color:#4e6b86; font-size:19px; line-height:1.58; max-width:550px; }
       .button { display:inline-flex; align-items:center; gap:12px; margin-top:16px; padding:16px 23px; border-radius:999px; background:var(--coral); box-shadow:0 10px 20px #f7796840; color:white; text-decoration:none; font-weight:700; }
-      .note { margin-top:20px; font-size:14px; color:#5f7990; } .art { position:relative; min-height:410px; border:1px solid var(--line); border-radius:44% 44% 34% 34%; overflow:hidden; background:linear-gradient(145deg,#b9e4ee 0 44%,#f8dc72 44% 68%,#a9d58d 68%); box-shadow:0 20px 45px #203c551c; }
-      .book { position:absolute; width:60%; left:20%; top:12%; padding:25px; min-height:305px; transform:rotate(-7deg); background:#ffe36b; box-shadow:13px 15px #102c5040; font-family:Fraunces,serif; } .book small { font-family:"DM Sans",sans-serif; color:#417691; font-weight:700; letter-spacing:.1em; text-transform:uppercase; } .book h2 { font-size:34px; line-height:.98; margin:28px 0 16px; } .book h2 em { color:var(--coral); } .book div { height:115px; border:4px solid var(--ink); background:linear-gradient(135deg,#86cdf2,#f0a6a4); } .spark { position:absolute; color:#fff; font-size:38px; } .s1 { top:13%; left:13%; }.s2 { right:12%; bottom:14%; color:var(--coral); }
+      .note { margin-top:20px; font-size:14px; color:#5f7990; } .art { position:relative; min-height:460px; border:1px solid var(--line); border-radius:42% 42% 32% 32%; overflow:hidden; box-shadow:0 20px 45px #203c551c; background:#b9e4ee; } .teaser-art { width:100%; height:100%; min-height:460px; display:block; object-fit:cover; object-position:65% center; } .art-note { position:absolute; left:22px; bottom:22px; max-width:220px; padding:14px 16px; background:#fffdf8e8; border:1px solid #ffffff99; border-radius:12px; box-shadow:0 7px 18px #17345222; font-size:13px; line-height:1.35; font-weight:700; } .art-note span { display:block; margin-bottom:4px; color:var(--coral); font-size:10px; letter-spacing:.11em; text-transform:uppercase; }
       footer { border-top:1px solid var(--line); padding:25px 0 35px; color:#6a8191; font-size:14px; display:flex; justify-content:space-between; gap:20px; }
-      @media(max-width:760px) { main { width:min(100% - 32px,560px); } header { padding:14px 0; }.logo{width:190px;height:64px}.status{font-size:12px}.hero{grid-template-columns:1fr;gap:34px;padding:48px 0 58px}.art{min-height:330px}footer{flex-direction:column} }
+      @media(max-width:760px) { main { width:min(100% - 32px,560px); } header { padding:9px 0; }.logo-crop{width:220px;height:104px}.logo{width:310px;left:-44px;top:-16px}.status{font-size:12px}.hero{grid-template-columns:1fr;gap:34px;padding:48px 0 58px}.art,.teaser-art{min-height:350px}footer{flex-direction:column} }
     </style>
   </head>
   <body>
     <div class="top">✦ A warm, private story studio is being prepared</div>
     <main>
-      <header><img class="logo" src="assets/printale-logo-source.jpg" alt="PrinTale — Register your Tales Story" /><span class="status">Opening soon</span></header>
+      <header><div class="logo-crop"><img class="logo" src="assets/printale-logo-source.jpg" alt="PrinTale — Register your Tales Story" /></div><span class="status">Opening soon</span></header>
       <section class="hero">
         <div>
           <div class="eyebrow">Personalized stories for little heroes</div>
@@ -34,7 +33,7 @@
           <a class="button" href="mailto:hello@printale.cloud?subject=PrinTale%20early%20access">Ask about early access →</a>
           <div class="note">A private preview is available to the PrinTale team.</div>
         </div>
-        <div class="art" aria-hidden="true"><span class="spark s1">✦</span><span class="spark s2">✦</span><div class="book"><small>A PrinTale adventure</small><h2>A little <em>big</em> adventure</h2><div></div></div></div>
+        <div class="art"><img class="teaser-art" src="assets/birthday-mystery-hero.png" alt="Children beginning a joyful storybook adventure" /><div class="art-note"><span>Coming soon</span>Personalized stories, made for their imagination.</div></div>
       </section>
       <footer><span>© PrinTale</span><span>Made with care for growing imaginations.</span></footer>
     </main>
