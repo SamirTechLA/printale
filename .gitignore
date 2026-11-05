@@ -1,0 +1,8 @@
+# Private configuration and locally generated customer material
+.env
+.env.*
+!.env.example
+outputs/
+node_modules/
+__pycache__/
+tmp/

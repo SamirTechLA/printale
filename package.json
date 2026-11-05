@@ -1,0 +1,13 @@
+{
+  "name": "printale",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PrinTale personalized storybook studio",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

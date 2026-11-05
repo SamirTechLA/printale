@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PrinTale — personalized illustrated adventures for kids." />
+    <title>PrinTale — Made for their biggest little adventures</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23f27c6e'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='36' fill='white'%3E✦%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="overrides.css" />
+    <link rel="stylesheet" href="motion.css?v=flight-demo" />
+    <link rel="stylesheet" href="avatar-upgrade.css?v=voice-story-v2" />
+  </head>
+  <body>
+    <div class="announcement"><span>✦</span><span class="announcement-copy">A warm, private story studio for growing imaginations</span><a href="#privacy">How we protect your family</a></div>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="PrinTale home"><span class="brand-mark" aria-hidden="true"><img class="brand-logo" src="assets/printale-header-reference.png" alt="" /></span><span class="brand-lockup"><span class="brand-name">Prin<span>Tale</span></span><small>Register your Tales Story</small></span></a>
+      <nav aria-label="Primary navigation"><a href="#how-it-works">How it works</a><a href="#stories">Stories</a><a href="#privacy">Privacy</a></nav>
+      <div class="header-tools"><label class="language-picker" for="website-language"><span class="visually-hidden">Website language</span><select id="website-language" aria-label="Website language"><option value="en">Website: English</option><option value="de">Website: Deutsch</option><option value="pt-BR">Website: Português (Brasil)</option><option value="es">Website: Español</option><option value="it">Website: Italiano</option></select></label><label class="language-picker" for="story-language"><span class="visually-hidden">Story language</span><select id="story-language" aria-label="Language for newly generated stories"><option value="en">Story: English</option><option value="de">Story: Deutsch</option><option value="pt-BR">Story: Português (Brasil)</option><option value="es">Story: Español</option><option value="it">Story: Italiano</option></select></label><a class="button button-small header-cta" href="#create">Make a story <span>→</span></a></div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="sparkle">✦</span> Their face. Their brave idea. Their story.</div>
+          <h1>Little heroes deserve <em>big</em> adventures.</h1>
+          <p class="hero-lede">Create an original illustrated storybook starring your child—their cartoon avatar, their imagination, and a wonderfully silly mystery to solve.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#create">Create their adventure <span>→</span></a><a class="text-link" href="#stories">See the pilot story <span>↓</span></a><button class="text-link motion-preview-button" id="preview-flight" type="button">Watch it fly <span>✦</span></button></div>
+          <div class="trust-row"><span><b>✓</b> Parent preview first</span><span><b>✓</b> No real photos in books</span><span><b>✓</b> Private by default</span></div>
+        </div>
+        <div class="hero-art" aria-label="An illustrated child detective, dog and robot looking for a birthday cake">
+          <div class="sun"></div><div class="cloud cloud-one"></div><div class="cloud cloud-two"></div>
+          <div class="hero-blob"></div>
+          <div class="story-cover hero-cover">
+            <div class="cover-top">A PrinTale adventure</div>
+            <div class="cover-title">The Missing<br /><i>Birthday Cake</i><br />Mystery</div>
+            <div class="cover-scene">
+              <div class="cover-cake"><span></span><i></i></div>
+              <div class="mini-kid"><div class="kid-hair"></div><div class="kid-face"></div><div class="kid-body"></div></div>
+              <div class="mini-dog"><i></i><b></b></div>
+              <div class="mini-bot"><i>♥</i></div>
+            </div>
+            <div class="cover-bottom">Starring <b>Aria</b></div>
+          </div>
+          <div class="tape tape-one"></div><div class="tape tape-two"></div>
+          <div class="doodle doodle-star">✦</div><div class="doodle doodle-loop">〰</div><div class="doodle doodle-heart">♥</div>
+          <div class="magic-dust" aria-hidden="true"><span>✦</span><span>•</span><span>✦</span><span>•</span><span>✦</span></div>
+          <div class="story-flight" aria-hidden="true"><span class="flight-trail">· · · ✦</span><span class="paper-plane">➤</span><span class="butterfly">🦋</span></div>
+          <div class="hero-note"><span>New!</span> A birthday mystery<br />with 3 suspects</div>
+        </div>
+      </section>
+
+      <section class="proof-strip" aria-label="PrinTale benefits">
+        <div><span>01</span><p><b>Made around them</b><br />An original cartoon hero, not a photo.</p></div>
+        <div><span>02</span><p><b>Joyfully thoughtful</b><br />Funny adventures with a little learning inside.</p></div>
+        <div><span>03</span><p><b>Yours to keep</b><br />Preview, print, and treasure every page.</p></div>
+      </section>
+
+      <section class="intro" id="how-it-works">
+        <div class="section-label">HOW A STORY SPARKS</div>
+        <h2>A very special story, in <em>three</em> delightful steps.</h2>
+        <div class="steps">
+          <article class="step-card peach hero-step-card"><div class="step-num">1</div><div class="step-hero-art" aria-hidden="true"></div><h3>Meet the hero</h3><p>Choose a warm, expressive storybook hero—or make a private cartoon preview that feels like them.</p></article>
+          <article class="step-card blue"><div class="step-num">2</div><div class="step-icon map-icon">⌁</div><h3>Pick the adventure</h3><p>Choose an age band, a bit of magic, and the kind of laugh-out-loud mission they’ll love.</p></article>
+          <article class="step-card yellow"><div class="step-num">3</div><div class="step-icon book-icon">✦</div><h3>Preview &amp; make it theirs</h3><p>Read every page together, then save a coloring page or prepare the book for print.</p></article>
+        </div>
+      </section>
+
+      <section class="featured-story" id="stories">
+        <div class="feature-illustration"><div class="feature-sky"></div><div class="mountain m1"></div><div class="mountain m2"></div><div class="cake-castle"><i></i><i></i><i></i><b></b></div><div class="feature-kid"></div><div class="feature-dog"></div><div class="feature-bot">♥</div><span class="clue clue-a">?</span><span class="clue clue-b">✦</span></div>
+        <div class="feature-copy"><div class="eyebrow light"><span class="sparkle">✦</span> Flagship pilot adventure</div><h2>The Missing Birthday<br /><em>Cake Mystery</em></h2><p>On the morning of their birthday party, the cake vanishes with a puff of pink frosting. Your young detective, a wiggly dog, and an exceptionally polite robot follow silly clues through the neighborhood to bring it home in time.</p><div class="story-meta"><span>Age 6–10</span><span>Problem solving</span><span>10 illustrated scenes</span></div><a class="button button-cream" href="#create">Start this mystery <span>→</span></a></div>
+      </section>
+
+      <section class="studio" id="create">
+        <div class="studio-heading"><div><div class="section-label">THE STORY STUDIO</div><h2>Let’s make a little magic.</h2></div><p>Our first storybook is a cozy 12-page keepsake: front cover, 10 story pages, and back cover.</p></div>
+        <div class="builder-shell">
+          <aside class="progress" aria-label="Story creation progress">
+            <div class="progress-item active" data-step="1"><span>1</span><div><b>Your hero</b><small>Choose an avatar</small></div></div>
+            <div class="progress-line"></div>
+            <div class="progress-item" data-step="2"><span>2</span><div><b>Your adventure</b><small>Set the story tone</small></div></div>
+            <div class="progress-line"></div>
+            <div class="progress-item" data-step="3"><span>3</span><div><b>Your preview</b><small>Read &amp; color</small></div></div>
+            <div class="progress-line"></div>
+            <div class="progress-item" data-step="4"><span>4</span><div><b>Print handoff</b><small>Review order concept</small></div></div>
+          </aside>
+          <div class="builder-main">
+            <section class="builder-panel active" data-panel="1">
+              <div class="panel-kicker">STEP 1 OF 4</div><div class="hero-picker-heading"><div><h3>Who’s starring today?</h3><p class="panel-intro">Choose a picture-book hero, or create a personalized cartoon hero from a parent-approved photo. The original photo stays out of the finished storybook.</p></div><span aria-hidden="true"></span></div>
+              <div class="avatar-grid" role="radiogroup" aria-label="Choose an avatar">
+                <button class="avatar-choice custom-avatar-choice" id="custom-avatar-choice" data-name="Your hero" data-style="custom" role="radio" aria-checked="false" hidden><span class="avatar-art custom"><img id="custom-avatar-photo" alt="Local photo preview" /></span><strong id="custom-avatar-name">Your hero</strong><small>Local photo preview</small></button>
+                <button class="avatar-choice selected" data-name="Aria" data-style="aria" role="radio" aria-checked="true"><span class="avatar-art aria"><i></i><b></b></span><strong>Aria</strong><small>Curious &amp; brave</small></button>
+                <button class="avatar-choice" data-name="Milo" data-style="milo" role="radio" aria-checked="false"><span class="avatar-art milo"><i></i><b></b></span><strong>Milo</strong><small>Big-hearted explorer</small></button>
+                <button class="avatar-choice" data-name="Jun" data-style="jun" role="radio" aria-checked="false"><span class="avatar-art jun"><i></i><b></b></span><strong>Jun</strong><small>Inventive dreamer</small></button>
+                <button class="avatar-choice" data-name="Zuri" data-style="zuri" role="radio" aria-checked="false"><span class="avatar-art zuri"><i></i><b></b></span><strong>Zuri</strong><small>Super clue finder</small></button>
+              </div>
+              <div class="photo-studio">
+                <div class="photo-studio-copy"><span class="photo-spark">✦</span><div><b>Make a cartoon from a photo</b><small>Your photo stays in this browser until a parent explicitly approves one cartoon request. The original photo is never placed in the storybook.</small></div></div>
+                <label class="hero-name-field" for="custom-hero-name"><span>Hero’s name · editable anytime</span><input id="custom-hero-name" type="text" maxlength="24" placeholder="For example, Leo" autocomplete="off" /></label>
+                <div class="photo-actions"><label class="photo-picker" for="photo-upload">Choose a photo <span>+</span></label><input id="photo-upload" type="file" accept="image/*" hidden /><button class="quiet-button" id="create-cartoon-demo" type="button" disabled>Create cartoon hero →</button><button class="quiet-button" id="reset-hero" type="button">Reset hero</button></div>
+                <label class="photo-consent" id="photo-consent-row" hidden><input id="photo-consent" type="checkbox" /><span><b>I’m this child’s parent or guardian, and I approve sending this photo once to OpenAI to create a cartoon hero.</b><small>The original photo is used only for this requested transformation and is not placed in the storybook. Your API account may be charged for this image request.</small></span></label><div class="photo-cartoon-status" id="photo-cartoon-status" aria-live="polite"></div>
+                <details class="future-photo-plan"><summary><span>✦</span><b>What happens when you create the cartoon hero</b><small>Parent approval required.</small></summary><div class="future-photo-steps"><div><strong>1</strong><p><b>Parent approval</b><small>You confirm that you are allowed to use the photo.</small></p></div><div><strong>2</strong><p><b>One-time processing</b><small>The photo goes only to OpenAI to make the cartoon hero.</small></p></div><div><strong>3</strong><p><b>Preview first</b><small>You see the cartoon before it is used in a story.</small></p></div><div><strong>4</strong><p><b>Original stays out</b><small>The original photo is not placed in the book.</small></p></div></div><p class="future-photo-note">Creating a cartoon hero may use paid image-generation credits on your OpenAI API account.</p></details>
+                <div class="photo-demo-result" id="photo-demo-result" hidden><img id="source-photo-preview" alt="Selected photo preview" /><div class="demo-arrow">→</div><div class="demo-result-avatar" id="demo-result-avatar" aria-label="Cartoon hero preview"></div><p><b>Cartoon hero ready</b><small>This cartoon—not the original photo—will be used in the local story preview.</small></p></div>
+              </div>
+              <div class="friend-row"><span class="friend-badge">+</span><div><b>Add a story friend</b><small>Optional in this demo—our dog and robot are ready either way.</small></div><button class="quiet-button" id="friend-toggle">Add friend</button></div>
+              <div class="panel-footer"><span class="privacy-mini">🔒 Your choices stay in this browser for this demo.</span><button class="button button-primary next-button" data-next="2">Choose the adventure <span>→</span></button></div>
+            </section>
+
+            <section class="builder-panel" data-panel="2">
+              <div class="panel-kicker">STEP 2 OF 4</div><h3>Choose the perfect kind of silly.</h3><p class="panel-intro">We’ll tune the words, clues, and reading pace for your young reader.</p>
+              <div class="field-group"><label>Story age band</label><div class="segmented" role="radiogroup"><button role="radio" aria-checked="false" data-age="3–6">3–6 <small>Read together</small></button><button class="selected" role="radio" aria-checked="true" data-age="6–10">6–10 <small>Early reader</small></button><button role="radio" aria-checked="false" data-age="10–13">10–13 <small>Big kid mystery</small></button></div></div>
+              <div class="field-group"><label>Today’s adventure</label><button class="adventure-card selected"><span class="adventure-symbol">🎂</span><span><b>The Missing Birthday Cake Mystery</b><small>A funny clue-led rescue with a dog and friendly robot.</small></span><i>✓</i></button></div>
+              <div class="mood-row"><label>Turn up the…</label><button class="pill selected">Giggles</button><button class="pill">Mystery</button><button class="pill">Teamwork</button><button class="pill">Science bits</button></div>
+              <section class="voice-story-studio" aria-labelledby="voice-story-title"><div class="voice-story-icon">♫</div><div class="voice-story-copy"><div class="panel-kicker">A LITTLE BIT OF THEIR IMAGINATION</div><h4 id="voice-story-title">Tell your adventure</h4><p>Tap once, say what should happen, then read the words together. You can always edit them.</p></div><div class="voice-story-actions"><button class="voice-story-button" id="start-story-voice" type="button"><span>●</span> Tell it</button><label class="voice-upload-button" for="voice-audio-upload">Upload audio</label><input id="voice-audio-upload" type="file" accept="audio/*" hidden /></div><textarea id="voice-story-idea" maxlength="280" placeholder="For example: ‘My robot and I find a secret map under the birthday cake!’" aria-label="Child's story idea"></textarea><div class="voice-story-status" id="voice-story-status" aria-live="polite">Nothing is recording yet.</div><audio class="voice-audio-preview" id="voice-audio-preview" controls hidden></audio><label class="voice-parent-consent" id="voice-parent-consent" hidden><input id="voice-consent" type="checkbox" /><span>I’m the parent or guardian and I approve using this story idea in the local preview.</span></label></section>
+              <div class="panel-footer"><button class="back-button" data-back="1">← Back</button><button class="button button-primary next-button" id="see-story" data-next="3">Create their story <span>→</span></button></div>
+            </section>
+
+            <section class="builder-panel" data-panel="3">
+              <div class="preview-head"><div><div class="panel-kicker">STEP 3 OF 4 · AI STORY DRAFT</div><h3 id="generated-story-heading"><span class="hero-name">Aria</span> and the cake clue.</h3><p class="story-idea-preview" id="story-idea-preview" hidden><b>Created from their idea:</b> <span id="story-idea-text"></span></p></div><span class="parent-approved">✓ Parent preview</span></div>
+              <div class="parent-preview-intro"><button class="parent-cover-card" id="cover-director" type="button" aria-label="Describe a new cover illustration"><div class="parent-cover-art" id="parent-cover-art" aria-hidden="true"></div><div><span class="chapter">FRONT COVER · CLICK TO DIRECT</span><b id="parent-cover-title">A PrinTale adventure</b><small>Starring <span class="hero-name">Aria</span></small></div></button><p><b>Parent check:</b> see the cover and the opening spread before the full book is prepared. You can go back and change the hero, idea, or story tone.</p><button class="quiet-button edit-hero-button" data-back="1" type="button">Edit hero &amp; name</button></div>
+              <section class="cover-art-studio" aria-labelledby="cover-art-title"><div><span class="chapter">PARENT ART DIRECTION</span><h4 id="cover-art-title">What should the illustrator show?</h4><p>Describe the scene, colors, or feeling. When your cartoon hero is ready, it is the reference for this cover and opening-page preview; the original photo is not sent again.</p></div><textarea id="cover-direction" maxlength="320" aria-label="Cover illustration direction">A moonlit garden with a curious fox, glowing flowers, and a tiny sleepy star.</textarea><div class="cover-art-actions"><button class="quiet-button" id="generate-cover-art" type="button">Create cover &amp; opening preview ✦</button><button class="quiet-button" id="generate-full-proof" type="button">Create full illustrated book proof ✦</button><span id="cover-art-status" aria-live="polite">Ready when you are.</span></div></section>
+              <div class="story-preview">
+                <div class="preview-page left-page"><div class="page-number">02</div><div class="page-copy"><span class="chapter">CHAPTER ONE</span><h4 id="generated-story-title">A trail of frosting!</h4><p id="generated-story-text">“Beep-beep,” said Bix the robot. “I have found a clue. It is pink, sticky, and surprisingly delicious.”</p><p><span class="hero-name">Aria</span> grinned. “Then our cake can’t be far away!”</p></div><div class="page-dots">•••</div></div>
+                <div class="preview-page right-page"><div class="preview-scene"><img class="story-scene-art" id="story-scene-art" src="assets/birthday-mystery-spread-1.png" alt="A child detective, dog and friendly robot discover a birthday cake clue" /><div class="story-hero-portrait aria" id="story-hero-portrait" aria-label="Selected hero preview"></div></div><div class="page-number">03</div></div>
+              </div>
+              <div class="preview-controls"><span>Opening spread: pages 2–3 · 12 pages total</span><button class="quiet-button" id="next-spread">Next spread →</button></div>
+              <div class="coloring-callout"><div class="coloring-mini">✎</div><div><b>A little bonus for later</b><small>Every story includes a black-and-white coloring page.</small></div><button class="quiet-button" id="show-coloring">Open coloring page</button></div>
+              <div class="panel-footer"><button class="back-button" data-back="2">← Change something</button><button class="quiet-button open-book-proof-now" type="button">Open full book preview</button><button class="button button-primary next-button" data-next="4">Looks good — review print <span>→</span></button></div>
+            </section>
+
+            <section class="builder-panel" data-panel="4">
+              <div class="panel-kicker">STEP 4 OF 4 · PARENT APPROVAL &amp; PRINT</div><h3>Your story is ready to become a keepsake.</h3><p class="panel-intro">A parent reviews every page, then approves a print-ready PDF for delivery. There is no download option in this experience.</p>
+              <section class="print-book-preview" aria-labelledby="print-preview-title"><div class="print-preview-head"><div><span class="chapter">YOUR 12-PAGE BOOK PREVIEW</span><h4 id="print-preview-title">Cover + opening pages</h4></div><span>Parent review</span></div><section class="art-cost-control" aria-labelledby="art-cost-title"><div><span class="chapter">SMART ART REVIEW</span><h5 id="art-cost-title">Change one page, not the whole book.</h5><p>Reading, editing story words, and turning pages are free. Only the button below makes one new illustration.</p></div><div class="art-cost-actions"><label for="replacement-page">Choose a page to replace</label><select id="replacement-page"><option value="2">Pages 5–6 · middle dinosaur scene</option><option value="3">Pages 7–8 · later dinosaur scene</option><option value="4">Pages 9–10 · ending dinosaur scene</option><option value="5">Page 12 · back cover</option><option value="11">Page 11 · outline coloring page</option><option value="0">Page 1 · front cover</option><option value="1">Pages 3–4 · opening dinosaur scene</option></select><button class="quiet-button" id="generate-single-replacement" type="button">Replace only this page ✦</button><span id="replacement-status" aria-live="polite">No images are being created.</span></div></section><button class="quiet-button" id="rebuild-full-proof" type="button">Rebuild the complete book (creates new images) ✦</button><div class="book-pages"><button class="mini-book-page mini-book-cover" id="print-cover-preview" type="button"><span>PrinTale</span><b id="print-book-title">The Missing Birthday Cake Mystery</b><i>Starring <span class="hero-name">Aria</span></i></button><button class="mini-book-page mini-book-copy" type="button"><span>02 · CHAPTER ONE</span><b id="print-page-title">A trail of frosting!</b><p id="print-page-copy">A very important clue is waiting.</p></button><button class="mini-book-page mini-book-art" id="print-page-art" type="button"><span>03</span><i>Opening illustration</i></button><button class="mini-book-page mini-book-copy later-page" type="button"><span>04–05 · THE ADVENTURE</span><b>More clues, more giggles</b><p>The complete book continues across five illustrated spreads.</p></button></div><button class="quiet-button open-book-preview" id="open-book-preview" type="button">Open full book preview →</button><p>Preview pages are created from the hero, story, and illustration you approved. Review the full 12-page proof before it is sent to print.</p></section>
+              <div class="handoff-grid"><div class="handoff-summary"><h4>Print &amp; delivery concept</h4><div><span>AI-personalized storybook</span><b>12 pages total</b></div><div><span>Interior story</span><b>10 pages · 5 spreads</b></div><div><span>Bonus coloring page</span><b>Included</b></div><div><span>Print-ready PDF</span><b>Sent to print partner</b></div><hr /><p><b>Next, in a connected product:</b> parent approves pages, confirms address and payment, then the print partner produces and delivers the book.</p></div></div>
+              <div class="safe-handoff"><span>🔒</span><p><b>Private by design.</b> Only the approved cartoon avatar and story details would be included in the production file. Real photos are excluded.</p></div>
+              <section class="print-route" aria-labelledby="print-route-title"><div><span class="chapter">PRINT PARTNER</span><h4 id="print-route-title">Choose the delivery route</h4><p id="print-route-copy">Peecho is the direct print-on-demand route for a parent-approved personalized book.</p></div><label for="print-provider">Production route</label><select id="print-provider"><option value="peecho">Peecho - print and deliver to the parent</option><option value="kdp">Amazon KDP - manual retail publishing package</option></select><p class="print-route-note" id="print-route-note">No order is sent yet. A Peecho sandbox account and private merchant keys are required before checkout can be connected.</p><button class="quiet-button" id="prepare-parent-proof" type="button">Open low-res parent PDF proof</button><button class="quiet-button" id="prepare-print-package" type="button">Prepare print handoff</button><span id="print-route-status" aria-live="polite">Your approved cartoon and story are the only content intended for the production package.</span></section>
+              <div class="panel-footer"><button class="back-button" data-back="3">← Back</button><button class="back-button" id="start-new-story" type="button">Start a new story</button><button class="button button-primary" id="complete-demo">Approve for print <span>✓</span></button></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="privacy-section" id="privacy"><div class="privacy-icon">✦</div><div><div class="section-label">A GENTLE PROMISE TO PARENTS</div><h2>Built for big imaginations.<br /><em>Guarded</em> with care.</h2></div><div class="privacy-copy"><p>PrinTale is designed so the magic stays in the story—not in your family’s data. Every book starts private, and a parent sees the finished words and pictures before anything is saved or printed.</p><div><span>✓ No real child photos in stories</span><span>✓ Parent-controlled approval</span><span>✓ Clear production boundaries</span></div></div></section>
+
+      <section class="closing"><div class="closing-doodle">✦</div><h2>Ready for a birthday<br />worth <em>remembering?</em></h2><p>Start with a little character. End with a very big smile.</p><a class="button button-primary" href="#create">Make their adventure <span>→</span></a></section>
+    </main>
+    <footer><a class="brand" href="#top" aria-label="PrinTale home"><span class="brand-mark" aria-hidden="true"><img class="brand-logo" src="assets/printale-header-reference.png" alt="" /></span><span class="brand-lockup"><span class="brand-name">Prin<span>Tale</span></span><small>Register your Tales Story</small></span></a><span>Made for make-believe, with parent peace of mind.</span><span>© 2026 PrinTale concept</span></footer>
+
+    <dialog id="coloring-dialog"><button class="modal-close" aria-label="Close coloring page">×</button><div class="coloring-modal"><div><div class="panel-kicker">BONUS COLORING PAGE</div><h3>The cake clue!</h3><p>A full picture-book scene to color at home, with the detective, dog, robot, and a very important cake clue.</p><button class="button button-primary" id="print-coloring">Print coloring page <span>↗</span></button></div><img class="coloring-art" src="assets/birthday-mystery-coloring-page.png" alt="Coloring page of a child detective, dog, robot and birthday cake mystery" /></div></dialog>
+    <dialog id="success-dialog"><div class="success-content"><div class="success-spark">✦</div><h3>Ready for parent-approved print!</h3><p>Your choices for <span class="hero-name">Aria</span>’s story are ready for the future print-and-delivery flow.</p><button class="button button-primary" id="close-success">Back to PrinTale</button></div></dialog>
+    <dialog id="book-preview-dialog" class="book-preview-dialog"><button class="modal-close" id="close-book-preview" aria-label="Close book preview">×</button><div class="book-reader-head"><span class="chapter">PARENT BOOK PREVIEW</span><h3>Turn the pages together</h3><p>Tap the page or the arrow to peek inside the keepsake.</p></div><div class="reader-stage" id="reader-stage"><article class="reader-page reader-left" id="reader-left"><span class="reader-page-no">COVER</span><b id="reader-left-title">The Missing Birthday Cake Mystery</b><i>Starring <span class="hero-name">Aria</span></i></article><article class="reader-page reader-right" id="reader-right"><span class="reader-page-no">02</span><b id="reader-right-title">A trail of frosting!</b><p id="reader-right-copy">A very important clue is waiting.</p></article></div><div class="reader-controls"><button class="quiet-button" id="reader-back" type="button">← Back</button><span id="reader-progress">Cover + page 2</span><button class="quiet-button" id="reader-next" type="button">Turn page →</button></div></dialog>
+    <script src="app.js?v=whole-page-localization-v7"></script>
+  </body>
+</html>
