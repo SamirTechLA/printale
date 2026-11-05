@@ -720,6 +720,7 @@ document.getElementById('prepare-print-package').addEventListener('click', async
 });
 document.getElementById('prepare-parent-proof').addEventListener('click', async () => {
   const button = document.getElementById('prepare-parent-proof');
+  const download = document.getElementById('download-parent-proof');
   const title = document.getElementById('generated-story-title').textContent;
   const story = document.getElementById('generated-story-text').textContent;
   button.disabled = true;
@@ -729,7 +730,9 @@ document.getElementById('prepare-parent-proof').addEventListener('click', async 
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'The parent proof could not be created.');
     window.open(result.url, '_blank', 'noopener');
-    printRouteStatus.textContent = 'Low-resolution parent proof opened. It is for approval only and is not sent to a printer.';
+    download.href = `${result.url}?download=1`;
+    download.hidden = false;
+    printRouteStatus.textContent = 'Low-resolution parent proof opened. You can also download it for approval only; it is not sent to a printer.';
   } catch (error) { printRouteStatus.textContent = error.message || 'The parent proof could not be created.'; }
   finally { button.disabled = false; }
 });

@@ -325,7 +325,11 @@ createServer(async (request, response) => {
   if (!filePath.startsWith(root) || requested.includes('/.')) return sendJson(response, 404, { error: 'Not found.' });
   try {
     const file = await readFile(filePath);
-    response.writeHead(200, { 'Content-Type': `${mimeTypes[extname(filePath)] || 'application/octet-stream'}; charset=utf-8`, 'Cache-Control': 'no-store' });
+    const headers = { 'Content-Type': `${mimeTypes[extname(filePath)] || 'application/octet-stream'}; charset=utf-8`, 'Cache-Control': 'no-store' };
+    if (extname(filePath) === '.pdf' && url.searchParams.get('download') === '1') {
+      headers['Content-Disposition'] = 'attachment; filename="printale-parent-proof.pdf"';
+    }
+    response.writeHead(200, headers);
     response.end(request.method === 'HEAD' ? undefined : file);
   } catch { sendJson(response, 404, { error: 'Not found.' }); }
 }).listen(port, '0.0.0.0', () => console.log(`PrinTale server listening on ${port}`));
