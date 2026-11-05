@@ -10,32 +10,31 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
     <style>
       :root { --ink:#122d50; --coral:#f77968; --paper:#fff9ed; --gold:#f5b841; --line:#eadcc4; }
-      * { box-sizing:border-box; } body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(circle at 82% 7%,#fff0c4 0,transparent 25rem),var(--paper); font-family:"DM Sans",sans-serif; }
-      .top { background:var(--ink); color:#fff6db; text-align:center; padding:10px 24px; font-size:14px; } main { width:min(1120px,calc(100% - 48px)); margin:0 auto; }
-      header { display:flex; align-items:center; justify-content:space-between; padding:18px 0; } .logo-crop { width:310px; height:196px; overflow:hidden; position:relative; } .logo { position:absolute; width:432px; max-width:none; left:-61px; top:-22px; } .status { color:#337f75; font-size:14px; font-weight:700; }
-      .hero { display:grid; grid-template-columns:1.04fr .96fr; align-items:center; gap:64px; padding:70px 0 82px; } .eyebrow { color:#558a9d; letter-spacing:.18em; text-transform:uppercase; font-size:12px; font-weight:700; }
-      h1 { font-family:Fraunces,serif; font-size:clamp(48px,6vw,76px); line-height:.98; letter-spacing:-.055em; margin:18px 0 24px; } h1 em { color:var(--coral); } p { color:#4e6b86; font-size:19px; line-height:1.58; max-width:550px; }
+      * { box-sizing:border-box; } body { margin:0; min-height:100vh; color:var(--ink); background:#f4f2ec; font-family:"DM Sans",sans-serif; padding:18px 14px 24px; }
+      .top { width:min(1100px,100%); margin:0 auto; background:var(--ink); color:#fff6db; text-align:center; padding:9px 24px; font-size:13px; } main { width:min(1100px,100%); min-height:700px; margin:0 auto; background:var(--paper); box-shadow:13px 14px 0 #2c384755; }
+      .logo-crop { width:365px; height:184px; overflow:hidden; position:relative; margin-bottom:12px; } .logo { position:absolute; width:506px; max-width:none; left:-71px; top:-24px; } .status { margin:0 0 46px 95px; color:var(--ink); font:400 39px/1.05 Fraunces,serif; letter-spacing:-.04em; }
+      .hero { display:grid; grid-template-columns:44% 56%; min-height:700px; } .hero-copy { padding:28px 52px 52px; display:flex; flex-direction:column; justify-content:center; } .eyebrow { color:#558a9d; letter-spacing:.18em; text-transform:uppercase; font-size:10px; font-weight:700; }
+      h1 { font-family:Fraunces,serif; font-size:clamp(46px,4.8vw,66px); line-height:.98; letter-spacing:-.06em; margin:18px 0 24px; } h1 em { color:var(--coral); } p { color:#4e6b86; font-size:16px; line-height:1.58; max-width:430px; }
       .button { display:inline-flex; align-items:center; gap:12px; margin-top:16px; padding:16px 23px; border-radius:999px; background:var(--coral); box-shadow:0 10px 20px #f7796840; color:white; text-decoration:none; font-weight:700; }
-      .note { margin-top:20px; font-size:14px; color:#5f7990; } .art { position:relative; min-height:460px; border:1px solid var(--line); border-radius:42% 42% 32% 32%; overflow:hidden; box-shadow:0 20px 45px #203c551c; background:#b9e4ee; } .teaser-art { width:100%; height:100%; min-height:460px; display:block; object-fit:cover; object-position:65% center; } .art-note { position:absolute; left:22px; bottom:22px; max-width:220px; padding:14px 16px; background:#fffdf8e8; border:1px solid #ffffff99; border-radius:12px; box-shadow:0 7px 18px #17345222; font-size:13px; line-height:1.35; font-weight:700; } .art-note span { display:block; margin-bottom:4px; color:var(--coral); font-size:10px; letter-spacing:.11em; text-transform:uppercase; }
-      footer { border-top:1px solid var(--line); padding:25px 0 35px; color:#6a8191; font-size:14px; display:flex; justify-content:space-between; gap:20px; }
-      @media(max-width:760px) { main { width:min(100% - 32px,560px); } header { padding:9px 0; }.logo-crop{width:220px;height:144px}.logo{width:310px;left:-44px;top:-16px}.status{font-size:12px}.hero{grid-template-columns:1fr;gap:34px;padding:48px 0 58px}.art,.teaser-art{min-height:350px}footer{flex-direction:column} }
+      .note { margin-top:20px; font-size:13px; color:#5f7990; } .art { min-height:700px; overflow:hidden; background:#b9e4ee; } .teaser-art { width:100%; height:700px; display:block; object-fit:cover; object-position:61% center; } footer { display:none; }
+      @media(max-width:760px) { body { padding:0; }.top,main { width:100%; }.top { font-size:11px; }.hero { grid-template-columns:1fr; min-height:0; }.hero-copy { padding:24px 28px 48px; }.logo-crop{width:270px;height:142px;margin-bottom:3px}.logo{width:375px;left:-53px;top:-18px}.status{margin:0 0 30px 43px;font-size:33px}.art,.teaser-art{min-height:390px;height:390px} }
     </style>
   </head>
   <body>
     <div class="top">✦ A warm, private story studio is being prepared</div>
     <main>
-      <header><div class="logo-crop"><img class="logo" src="assets/printale-logo-source.jpg" alt="PrinTale — Register your Tales Story" /></div><span class="status">Opening soon</span></header>
       <section class="hero">
-        <div>
+        <div class="hero-copy">
+          <div class="logo-crop"><img class="logo" src="assets/printale-logo-source.jpg" alt="PrinTale — Register your Tales Story" /></div>
+          <div class="status">Opening soon</div>
           <div class="eyebrow">Personalized stories for little heroes</div>
           <h1>Every child deserves a <em>tale</em> of their own.</h1>
           <p>PrinTale is creating beautiful, parent-approved storybooks that turn a child’s imagination into a keepsake.</p>
           <a class="button" href="mailto:hello@printale.cloud?subject=PrinTale%20early%20access">Ask about early access →</a>
           <div class="note">A private preview is available to the PrinTale team.</div>
         </div>
-        <div class="art"><img class="teaser-art" src="assets/birthday-mystery-hero.png" alt="Children beginning a joyful storybook adventure" /><div class="art-note"><span>Coming soon</span>Personalized stories, made for their imagination.</div></div>
+        <div class="art"><img class="teaser-art" src="assets/birthday-mystery-hero.png" alt="Children beginning a joyful storybook adventure" /></div>
       </section>
-      <footer><span>© PrinTale</span><span>Made with care for growing imaginations.</span></footer>
     </main>
   </body>
 </html>
