@@ -2,16 +2,55 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { spawn } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 
 const port = Number(process.env.PORT || 4173);
 const root = process.cwd();
 const mimeTypes = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml' };
 const imageProductionRules = `This is a SQUARE, IMAGE-ONLY illustration panel for a professionally typeset book. Compose for a nearly square page, not a wide landscape. The story title is deliberately withheld: never invent or draw it. Never draw, write, imitate, or crop any text: no words, letters, title, caption, logo, watermark, speech bubble, sign, label, or decorative pseudo-text. The book layout adds all written story text separately. Keep every face, head, hand, key prop, and focal action safely inside the central 72% of the frame; leave calm, uncluttered outer margins on every side and never crop the hero or the key story action.`;
+const teaserMode = process.env.PRINTALE_SITE_MODE === 'teaser';
+const previewPassword = process.env.PRINTALE_PREVIEW_PASSWORD || '';
+const previewCookieName = 'printale_preview';
+const previewSessionToken = previewPassword
+  ? createHash('sha256').update(`printale-preview:${previewPassword}`).digest('base64url')
+  : '';
 
 function sendJson(response, status, body) {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
   response.end(JSON.stringify(body));
+}
+
+function cookies(request) {
+  return Object.fromEntries(String(request.headers.cookie || '').split(';').map((part) => {
+    const [key, ...value] = part.trim().split('=');
+    return [key, value.join('=')];
+  }).filter(([key]) => key));
+}
+
+function hasMatchingValue(received, expected) {
+  const left = Buffer.from(received || '');
+  const right = Buffer.from(expected || '');
+  return left.length === right.length && left.length > 0 && timingSafeEqual(left, right);
+}
+
+function grantPreviewAccess(request, response) {
+  if (!teaserMode) return true;
+  if (previewSessionToken && hasMatchingValue(cookies(request)[previewCookieName], previewSessionToken)) return true;
+  const authorization = String(request.headers.authorization || '');
+  const encoded = authorization.startsWith('Basic ') ? authorization.slice(6) : '';
+  let submittedPassword = '';
+  try { submittedPassword = Buffer.from(encoded, 'base64').toString('utf8').split(':').slice(1).join(':'); } catch { /* denied below */ }
+  if (previewPassword && hasMatchingValue(submittedPassword, previewPassword)) {
+    response.setHeader('Set-Cookie', `${previewCookieName}=${previewSessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`);
+    return true;
+  }
+  response.writeHead(401, {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'WWW-Authenticate': 'Basic realm="PrinTale private preview", charset="UTF-8"',
+    'Cache-Control': 'no-store',
+  });
+  response.end('Private preview only.');
+  return false;
 }
 
 function peechoSetupStatus() {
@@ -184,6 +223,9 @@ async function createCartoonHero(imageDataUrl) {
 
 createServer(async (request, response) => {
   const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
+  const privateStudioRequest = url.pathname === '/preview' || url.pathname === '/index.html';
+  const protectedApiRequest = url.pathname.startsWith('/api/') || url.pathname.startsWith('/outputs/');
+  if (teaserMode && (privateStudioRequest || protectedApiRequest) && !grantPreviewAccess(request, response)) return;
   if (request.method === 'GET' && url.pathname === '/api/peecho/status') {
     return sendJson(response, 200, peechoSetupStatus());
   }
@@ -276,7 +318,7 @@ createServer(async (request, response) => {
     return;
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed.' });
-  const requested = url.pathname === '/' ? '/index.html' : url.pathname;
+  const requested = privateStudioRequest ? '/index.html' : url.pathname === '/' ? (teaserMode ? '/teaser.html' : '/index.html') : url.pathname;
   const filePath = normalize(join(root, requested));
   if (!filePath.startsWith(root) || requested.includes('/.')) return sendJson(response, 404, { error: 'Not found.' });
   try {
