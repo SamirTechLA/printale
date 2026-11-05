@@ -27,6 +27,24 @@ function repairInteractiveLabels() {
   const set = (id, label) => { const element = document.getElementById(id); if (element && !element.textContent.trim()) element.textContent = label; };
   set('next-spread', labels.next); set('show-coloring', labels.color); set('generate-cover-art', labels.cover); set('generate-full-proof', labels.proof);
 }
+const artGenerationOverlay = document.getElementById('art-generation-overlay');
+const artGenerationTitle = document.getElementById('art-generation-title');
+const artGenerationDetail = document.getElementById('art-generation-detail');
+const artGenerationBar = document.getElementById('art-generation-bar');
+const artGenerationPercent = document.getElementById('art-generation-percent');
+function setArtGenerationLock(percent, title, detail) {
+  const value = Math.max(0, Math.min(100, Math.round(percent)));
+  artGenerationOverlay.hidden = false;
+  document.body.classList.add('art-generation-active');
+  artGenerationTitle.textContent = title;
+  artGenerationDetail.textContent = detail;
+  artGenerationBar.style.width = `${value}%`;
+  artGenerationPercent.textContent = `${value}%`;
+}
+function clearArtGenerationLock() {
+  artGenerationOverlay.hidden = true;
+  document.body.classList.remove('art-generation-active');
+}
 const translationCache = new Map();
 const protectedTranslationSelectors = '#generated-story-title,#generated-story-text,#generated-story-heading,#story-idea-text,.hero-name,#custom-hero-name,#custom-hero-name + *,.avatar-choice,.pill,#voice-story-idea,#custom-hero-name,#print-book-title,#print-page-title,#print-page-copy';
 const interfaceTextNodes = [...document.querySelectorAll('header, main, footer')].flatMap((root) => [...root.childNodes]).flatMap(function collect(node) {
@@ -546,10 +564,13 @@ generateCoverArt.addEventListener('click', async () => {
   const heroImage = customAvatarChoice.dataset.cartoon === 'ready' ? customAvatarPhoto.src : '';
   if (photoUpload.files.length > 0 && customAvatarChoice.classList.contains('selected') && !heroImage) {
     coverArtStatus.textContent = 'Create the cartoon hero first, then the cover and opening page will use it as their character reference.';
+    generateCoverArt.disabled = false;
+    generateCoverArt.textContent = 'Create cover & opening preview ✦';
     showStep(1);
     return;
   }
   coverArtStatus.textContent = heroImage ? 'Creating a cover and opening page around your cartoon hero…' : 'Creating a fresh cover and opening-page preview…';
+  setArtGenerationLock(10, 'Creating your cover preview…', 'Please keep this page open while we prepare the illustration.');
   try {
     const response = await fetch('/api/generate-art', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ direction, title: document.getElementById('generated-story-title').textContent, heroImage, heroName: state.name }) });
     const result = await response.json();
@@ -558,11 +579,13 @@ generateCoverArt.addEventListener('click', async () => {
     storySceneArt.src = result.image;
     storySceneArt.alt = `Opening story illustration: ${direction}`;
     syncPrintPreview();
+    setArtGenerationLock(100, 'Cover preview ready', 'Finishing the page…');
     coverArtStatus.textContent = heroImage ? 'New cover and opening-page preview ready, built around your cartoon hero.' : 'New cover and opening-page preview ready for parent review.';
     saveProgress();
   } catch (error) {
     coverArtStatus.textContent = error.message || 'Illustration generation could not start.';
   } finally {
+    clearArtGenerationLock();
     generateCoverArt.disabled = false;
     generateCoverArt.textContent = 'Create cover & opening preview ✦';
   }
@@ -597,20 +620,26 @@ async function createFullProof() {
   generateFullProof.disabled = true;
   generateCoverArt.disabled = true;
   bookSceneArt = [];
+  const totalImages = directions.length + 1;
+  setArtGenerationLock(0, 'Preparing your illustrated book…', `Creating 0 of ${totalImages} illustrations. Please keep this page open.`);
   try {
     for (let index = 0; index < directions.length; index += 1) {
       coverArtStatus.textContent = `Creating illustration ${index + 1} of ${directions.length}…`;
+      setArtGenerationLock((index / totalImages) * 100, 'Creating your illustrated book…', `Creating illustration ${index + 1} of ${totalImages}.`);
       const response = await fetch('/api/generate-art', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ direction: directions[index].slice(0, 320), title, heroImage, heroName: state.name }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Illustration generation could not start.');
       bookSceneArt.push(result.image);
+      setArtGenerationLock(((index + 1) / totalImages) * 100, 'Creating your illustrated book…', `Illustration ${index + 1} of ${totalImages} is ready.`);
     }
     coverArtStatus.textContent = 'Creating the outline coloring page…';
+    setArtGenerationLock((directions.length / totalImages) * 100, 'Creating the coloring page…', `Creating illustration ${totalImages} of ${totalImages}.`);
     const coloringDirection = `[COLORING] ${storyPromise} Final coloring moment: ${(moments[4] || story).slice(0, 150)}. ${artBrief}`;
     const coloringResponse = await fetch('/api/generate-art', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ direction: coloringDirection.slice(0, 320), title, heroImage, heroName: state.name }) });
     const coloringResult = await coloringResponse.json();
     if (!coloringResponse.ok) throw new Error(coloringResult.error || 'Coloring page generation could not start.');
     coloringSceneArt = coloringResult.image;
+    setArtGenerationLock(100, 'Your illustrated book is ready', 'Opening the parent preview…');
     parentCoverArt.style.backgroundImage = `linear-gradient(180deg,rgba(22,47,77,0) 42%,rgba(22,47,77,.18)),url("${bookSceneArt[0]}")`;
     storySceneArt.src = bookSceneArt[1];
     storySceneArt.alt = `Opening story illustration for ${title}`;
@@ -622,6 +651,7 @@ async function createFullProof() {
   } catch (error) {
     coverArtStatus.textContent = error.message || 'The full book proof could not be completed.';
   } finally {
+    clearArtGenerationLock();
     generateFullProof.disabled = false;
     generateCoverArt.disabled = false;
   }
