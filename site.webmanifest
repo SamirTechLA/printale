@@ -1,0 +1,9 @@
+{
+  "name": "PrinTale — Personalized Storybooks",
+  "short_name": "PrinTale",
+  "description": "Personalized illustrated storybooks for children, created with parent review.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff9ed",
+  "theme_color": "#162f4d"
+}

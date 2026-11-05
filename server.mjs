@@ -6,7 +6,7 @@ import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 
 const port = Number(process.env.PORT || 4173);
 const root = process.cwd();
-const mimeTypes = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml' };
+const mimeTypes = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.webmanifest': 'application/manifest+json' };
 const imageProductionRules = `This is a SQUARE, IMAGE-ONLY illustration panel for a professionally typeset book. Compose for a nearly square page, not a wide landscape. The story title is deliberately withheld: never invent or draw it. Never draw, write, imitate, or crop any text: no words, letters, title, caption, logo, watermark, speech bubble, sign, label, or decorative pseudo-text. The book layout adds all written story text separately. Keep every face, head, hand, key prop, and focal action safely inside the central 72% of the frame; leave calm, uncluttered outer margins on every side and never crop the hero or the key story action.`;
 const childSafeStorybookContext = `This is a fictional, family-safe children's storybook scene. All people are fictional illustrated characters, never real people. Show every character fully clothed, in a calm and positive setting. Do not depict danger, injury, fear, violence, weapons, adult themes, romance, or distress. If the story brief could imply any of those, reinterpret it as a gentle, age-appropriate make-believe moment.`;
 const teaserMode = process.env.PRINTALE_SITE_MODE === 'teaser';
