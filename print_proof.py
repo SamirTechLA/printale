@@ -11,8 +11,26 @@ os.makedirs(os.path.dirname(out), exist_ok=True)
 book = canvas.Canvas(out, pagesize=(576, 576))
 book.setTitle(payload.get('title', 'PrinTale parent proof'))
 navy, cream, coral = HexColor('#173452'), HexColor('#fffaf0'), HexColor('#f27c6e')
-pdfmetrics.registerFont(TTFont('StorySparkText', r'C:\Windows\Fonts\arial.ttf'))
-pdfmetrics.registerFont(TTFont('StorySparkBold', r'C:\Windows\Fonts\arialbd.ttf'))
+font_dirs = [os.environ.get('PRINTALE_FONT_DIR', ''), r'C:\Windows\Fonts', '/usr/share/fonts/ttf-dejavu', '/usr/share/fonts/TTF']
+
+def first_font(names):
+    for folder in font_dirs:
+        for name in names:
+            candidate = os.path.join(folder, name)
+            if folder and os.path.exists(candidate):
+                return candidate
+    return None
+
+regular_font = first_font(['DejaVuSans.ttf', 'arial.ttf'])
+bold_font = first_font(['DejaVuSans-Bold.ttf', 'arialbd.ttf'])
+text_font_name = 'Helvetica'
+bold_font_name = 'Helvetica-Bold'
+if regular_font:
+    pdfmetrics.registerFont(TTFont('StorySparkText', regular_font))
+    text_font_name = 'StorySparkText'
+if bold_font:
+    pdfmetrics.registerFont(TTFont('StorySparkBold', bold_font))
+    bold_font_name = 'StorySparkBold'
 
 def clean(text):
     return str(text or '').replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"').replace('\u2014', '-').replace('\u2013', '-')
@@ -37,27 +55,27 @@ def cover(page, heading, copy='', art=''):
     pic = image(art)
     if pic:
         book.drawImage(pic, 0, 150, 576, 426, preserveAspectRatio=True, anchor='c', mask='auto')
-    book.setFillColor(navy); book.setFont('StorySparkBold', 8); book.drawString(36, 542, clean(page))
+    book.setFillColor(navy); book.setFont(bold_font_name, 8); book.drawString(36, 542, clean(page))
     if not pic:
         # Story pages use centered, generous type so the parent proof remains
         # easy to read and never looks like an unfinished blank page.
-        heading_lines = lines(heading, 'StorySparkBold', 23, 470)[:2]
-        copy_lines = lines(copy, 'StorySparkText', 16, 470)
+        heading_lines = lines(heading, bold_font_name, 23, 470)[:2]
+        copy_lines = lines(copy, text_font_name, 16, 470)
         if len(copy_lines) < 5: copy_lines += [''] * (5 - len(copy_lines))
         block_height = len(heading_lines) * 29 + 18 + len(copy_lines) * 23
         y = (576 + block_height) / 2
-        book.setFont('StorySparkBold', 23)
+        book.setFont(bold_font_name, 23)
         for line in heading_lines: book.drawString(53, y, line); y -= 29
-        y -= 18; book.setFont('StorySparkText', 16)
+        y -= 18; book.setFont(text_font_name, 16)
         for line in copy_lines: book.drawString(53, y, line); y -= 23
     else:
-        heading_lines = lines(heading, 'StorySparkBold', 25, 500)[:2]
+        heading_lines = lines(heading, bold_font_name, 25, 500)[:2]
         y = 108 + (len(heading_lines) - 1) * 29
-        book.setFont('StorySparkBold', 25)
+        book.setFont(bold_font_name, 25)
         for line in heading_lines: book.drawString(36, y, line); y -= 29
-        book.setFont('StorySparkText', 12)
-        for line in lines(copy, 'StorySparkText', 12, 500)[:3]: book.drawString(36, y - 10, line); y -= 16
-    book.setFillColor(coral); book.setFont('StorySparkBold', 8); book.drawRightString(540, 28, 'LOW-RES PARENT PROOF - NOT FOR PRINT')
+        book.setFont(text_font_name, 12)
+        for line in lines(copy, text_font_name, 12, 500)[:3]: book.drawString(36, y - 10, line); y -= 16
+    book.setFillColor(coral); book.setFont(bold_font_name, 8); book.drawRightString(540, 28, 'LOW-RES PARENT PROOF - NOT FOR PRINT')
     book.showPage()
 
 def art_page(art):

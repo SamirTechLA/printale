@@ -68,7 +68,9 @@ function peechoSetupStatus() {
 function createParentProof(payload) {
   const id = randomUUID();
   const output = join(root, 'outputs', 'print-proofs', `${id}.pdf`);
-  const python = process.env.STORYSPARK_PYTHON || 'C:\\Users\\sciampa\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe';
+  const python = process.env.STORYSPARK_PYTHON || (process.platform === 'win32'
+    ? 'C:\\Users\\sciampa\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe'
+    : 'python3');
   return new Promise((resolve, reject) => {
     // Explicit UTF-8 prevents curly apostrophes and names from turning into
     // mojibake when Windows launches the PDF renderer.
