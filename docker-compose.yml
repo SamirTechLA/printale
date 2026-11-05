@@ -8,5 +8,17 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-    ports:
-      - "127.0.0.1:3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=n8n_default"
+      - 'traefik.http.routers.printale.rule=Host(`printale.cloud`) || Host(`www.printale.cloud`)'
+      - "traefik.http.routers.printale.entrypoints=web,websecure"
+      - "traefik.http.routers.printale.tls=true"
+      - "traefik.http.routers.printale.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.printale.loadbalancer.server.port=3000"
+    networks:
+      - n8n_default
+
+networks:
+  n8n_default:
+    external: true
