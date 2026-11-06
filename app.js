@@ -86,7 +86,7 @@ const websiteCopySelectors = [
   '.studio-heading .section-label', '.studio-heading h2', '.studio-heading p', '.progress-item b', '.progress-item small',
   '[data-panel="1"] .panel-kicker', '[data-panel="1"] h3', '[data-panel="1"] .panel-intro', '[data-panel="1"] .photo-studio-copy b', '[data-panel="1"] .photo-studio-copy small', '[data-panel="1"] .hero-name-field > span', '[data-panel="1"] .photo-picker', '[data-panel="1"] #reset-hero', '[data-panel="1"] .photo-consent b', '[data-panel="1"] .photo-consent small', '[data-panel="1"] .friend-row b', '[data-panel="1"] .friend-row small', '[data-panel="1"] #friend-toggle',
   '[data-panel="2"] .panel-kicker', '[data-panel="2"] h3', '[data-panel="2"] .panel-intro', '[data-panel="2"] h4', '[data-panel="2"] .voice-story-copy p', '[data-panel="2"] #start-story-voice', '[data-panel="2"] .voice-upload-button', '[data-panel="2"] .voice-parent-consent span', '[data-panel="2"] .back-button', '[data-panel="2"] #see-story',
-  '[data-panel="3"] .panel-kicker', '[data-panel="3"] .parent-approved', '[data-panel="3"] .parent-preview-intro > p', '[data-panel="3"] .edit-hero-button', '[data-panel="3"] .chapter', '[data-panel="3"] #cover-art-title', '[data-panel="3"] .cover-art-studio p', '[data-panel="3"] #generate-cover-art', '[data-panel="3"] #generate-full-proof', '[data-panel="3"] .preview-controls > span', '[data-panel="3"] #next-spread', '[data-panel="3"] .coloring-callout b', '[data-panel="3"] .coloring-callout small', '[data-panel="3"] #show-coloring', '[data-panel="3"] .back-button', '[data-panel="3"] .open-book-proof-now', '[data-panel="3"] .next-button',
+  '[data-panel="3"] .panel-kicker', '[data-panel="3"] .parent-approved', '[data-panel="3"] .parent-preview-intro > p', '[data-panel="3"] .edit-hero-button', '[data-panel="3"] .chapter', '[data-panel="3"] #cover-art-status', '[data-panel="3"] .preview-controls > span', '[data-panel="3"] #next-spread', '[data-panel="3"] .coloring-callout b', '[data-panel="3"] .coloring-callout small', '[data-panel="3"] #show-coloring', '[data-panel="3"] .back-button', '[data-panel="3"] .open-book-proof-now', '[data-panel="3"] .next-button',
   '[data-panel="4"] .panel-kicker', '[data-panel="4"] > h3', '[data-panel="4"] > p', '[data-panel="4"] .chapter', '[data-panel="4"] #print-preview-title', '[data-panel="4"] .print-preview-head > span', '[data-panel="4"] #art-cost-title', '[data-panel="4"] .art-cost-control p', '[data-panel="4"] label', '[data-panel="4"] #replacement-page option', '[data-panel="4"] #generate-single-replacement', '[data-panel="4"] #replacement-status', '[data-panel="4"] #rebuild-full-proof', '[data-panel="4"] .open-book-preview', '[data-panel="4"] .print-book-preview > p', '[data-panel="4"] .handoff-summary h4', '[data-panel="4"] .handoff-summary > div span', '[data-panel="4"] .handoff-summary > div b', '[data-panel="4"] .handoff-summary p', '[data-panel="4"] .safe-handoff p', '[data-panel="4"] #print-route-title', '[data-panel="4"] #print-route-copy', '[data-panel="4"] #print-route-note', '[data-panel="4"] #print-provider option', '[data-panel="4"] #prepare-parent-proof', '[data-panel="4"] #prepare-print-package', '[data-panel="4"] #print-route-status', '[data-panel="4"] .back-button', '[data-panel="4"] #start-new-story', '[data-panel="4"] #complete-demo',
   '.privacy-section .section-label', '.privacy-section h2', '.privacy-section p', '.privacy-copy span', '.closing h2', '.closing p', '.closing a', 'footer span',
   '#coloring-dialog .panel-kicker', '#coloring-dialog h3', '#coloring-dialog p', '#print-coloring', '#success-dialog h3', '#success-dialog p', '#close-success', '.book-reader-head .chapter', '.book-reader-head h3', '.book-reader-head p', '#reader-back', '#reader-next'
@@ -95,7 +95,7 @@ const websiteCopyNodes = [...document.querySelectorAll(websiteCopySelectors)].fi
 const websiteCopySource = websiteCopyNodes.map((element) => element.textContent.trim());
 async function translateWebsiteCopy(language) {
   if (language === 'en') { websiteCopyNodes.forEach((element, index) => { element.textContent = websiteCopySource[index]; }); return; }
-  const cacheKey = `storyspark-website-copy-v5-${language}`;
+  const cacheKey = `storyspark-website-copy-v6-${language}`;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
   const translated = cached && cached.length === websiteCopyNodes.length ? cached : await fetch('/api/translate-interface', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language, texts: websiteCopySource }) }).then(async (response) => { const result = await response.json(); if (!response.ok) throw new Error(result.error); localStorage.setItem(cacheKey, JSON.stringify(result.texts)); return result.texts; });
   websiteCopyNodes.forEach((element, index) => { element.textContent = translated[index]; });
@@ -184,11 +184,12 @@ document.querySelectorAll('[data-next]').forEach((button) => button.addEventList
     document.getElementById('voice-parent-consent').hidden = false;
     return;
   }
-  if (nextStep !== 3 || !idea.value.trim()) return showStep(nextStep);
+  if (nextStep !== 3) return showStep(nextStep);
+  const storyIdea = idea.value.trim() || `${state.name} solves the Missing Birthday Cake Mystery with a friendly dog and robot.`;
   button.disabled = true;
-  button.textContent = 'Creating their story…';
-  status.textContent = 'Creating a child-safe story draft…';
-  fetch('/api/generate-story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idea: idea.value.trim(), heroName: state.name, language: state.language }) })
+  button.textContent = 'Creating story & illustrations…';
+  status.textContent = 'Creating a child-safe story and its illustrations…';
+  fetch('/api/generate-story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idea: storyIdea, heroName: state.name, language: state.language }) })
     .then(async (response) => {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Story generation could not start.');
@@ -196,9 +197,11 @@ document.querySelectorAll('[data-next]').forEach((button) => button.addEventList
       document.getElementById('generated-story-heading').textContent = result.title;
       document.getElementById('parent-cover-title').textContent = result.title;
       document.getElementById('generated-story-text').textContent = result.story;
+      coverDirection.value = buildIllustrationDirection();
       syncPrintPreview();
-      status.textContent = 'Story draft ready for parent review.';
+      status.textContent = 'Story ready. Creating the full illustrated book…';
       showStep(nextStep);
+      await createFullProof();
     })
     .catch((error) => { status.textContent = error.message || 'Story generation could not start.'; })
     .finally(() => { button.disabled = false; button.innerHTML = 'Create their story <span>→</span>'; });
@@ -415,10 +418,7 @@ document.getElementById('next-spread').addEventListener('click', (event) => {
   event.currentTarget.previousElementSibling.textContent = state.spread === 1 ? 'Opening spread: pages 2–3 · 12 pages total' : `Preview: interior spread ${state.spread} of 5 · 12 pages total`;
   event.currentTarget.textContent = state.spread === 5 ? 'Back to opening spread ↺' : 'Next spread →';
 });
-const coverDirector = document.getElementById('cover-director');
 const coverDirection = document.getElementById('cover-direction');
-const generateCoverArt = document.getElementById('generate-cover-art');
-const generateFullProof = document.getElementById('generate-full-proof');
 const coverArtStatus = document.getElementById('cover-art-status');
 const parentCoverArt = document.getElementById('parent-cover-art');
 const storySceneArt = document.getElementById('story-scene-art');
@@ -553,48 +553,11 @@ document.getElementById('close-book-preview').addEventListener('click', () => bo
 document.getElementById('reader-next').addEventListener('click', () => turnReader('next'));
 document.getElementById('reader-back').addEventListener('click', () => turnReader('back'));
 readerStage.addEventListener('click', () => turnReader('next'));
-coverDirector.addEventListener('click', () => {
-  coverDirection.focus();
-  coverDirection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
-generateCoverArt.addEventListener('click', async () => {
-  const direction = coverDirection.value.trim();
-  if (!direction) {
-    coverArtStatus.textContent = 'Please describe what the illustrator should show.';
-    coverDirection.focus();
-    return;
-  }
-  generateCoverArt.disabled = true;
-  generateCoverArt.textContent = 'Illustrating your preview…';
-  const heroImage = customAvatarChoice.dataset.cartoon === 'ready' ? customAvatarPhoto.src : '';
-  if (photoUpload.files.length > 0 && customAvatarChoice.classList.contains('selected') && !heroImage) {
-    coverArtStatus.textContent = 'Create the cartoon hero first, then the cover and opening page will use it as their character reference.';
-    generateCoverArt.disabled = false;
-    generateCoverArt.textContent = 'Create cover & opening preview ✦';
-    showStep(1);
-    return;
-  }
-  coverArtStatus.textContent = heroImage ? 'Creating a cover and opening page around your cartoon hero…' : 'Creating a fresh cover and opening-page preview…';
-  setArtGenerationLock(10, 'Creating your cover preview…', 'Please keep this page open while we prepare the illustration.');
-  try {
-    const response = await fetch('/api/generate-art', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ direction, title: document.getElementById('generated-story-title').textContent, heroImage, heroName: state.name }) });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || 'Illustration generation could not start.');
-    parentCoverArt.style.backgroundImage = `linear-gradient(180deg,rgba(22,47,77,0) 42%,rgba(22,47,77,.18)),url("${result.image}")`;
-    storySceneArt.src = result.image;
-    storySceneArt.alt = `Opening story illustration: ${direction}`;
-    syncPrintPreview();
-    setArtGenerationLock(100, 'Cover preview ready', 'Finishing the page…');
-    coverArtStatus.textContent = heroImage ? 'New cover and opening-page preview ready, built around your cartoon hero.' : 'New cover and opening-page preview ready for parent review.';
-    saveProgress();
-  } catch (error) {
-    coverArtStatus.textContent = error.message || 'Illustration generation could not start.';
-  } finally {
-    clearArtGenerationLock();
-    generateCoverArt.disabled = false;
-    generateCoverArt.textContent = 'Create cover & opening preview ✦';
-  }
-});
+function buildIllustrationDirection() {
+  const selectedMoods = [...document.querySelectorAll('.mood-row .pill.selected')].map((pill) => pill.textContent.trim()).join(', ') || 'warmth and curiosity';
+  const adventure = document.querySelector('.adventure-card b')?.textContent.trim() || 'a playful mystery';
+  return `Warm, joyful, child-safe picture-book art for ages ${state.age}. Adventure: ${adventure}. Tone: ${selectedMoods}. Keep the hero expressive, the setting inviting, and the visual storytelling clear.`;
+}
 async function createFullProof() {
   const direction = coverDirection.value.trim();
   const story = document.getElementById('generated-story-text').textContent;
@@ -622,8 +585,6 @@ async function createFullProof() {
     `FINAL SCENE. ${storyPromise} Beat: ${moments[4].slice(0, 130)}. ${artBrief} Show the gentle happy ending with the same hero and story world.`,
     `BACK COVER. ${storyPromise} ${artBrief} Show one small, peaceful closing moment with the same hero and story world. No new characters or unrelated scenery.`,
   ];
-  generateFullProof.disabled = true;
-  generateCoverArt.disabled = true;
   bookSceneArt = [];
   const totalImages = directions.length + 1;
   setArtGenerationLock(0, 'Preparing your illustrated book…', `Creating 0 of ${totalImages} illustrations. Please keep this page open.`);
@@ -657,11 +618,8 @@ async function createFullProof() {
     coverArtStatus.textContent = error.message || 'The full book proof could not be completed.';
   } finally {
     clearArtGenerationLock();
-    generateFullProof.disabled = false;
-    generateCoverArt.disabled = false;
   }
 }
-generateFullProof.addEventListener('click', createFullProof);
 document.getElementById('rebuild-full-proof').addEventListener('click', createFullProof);
 const replacementPage = document.getElementById('replacement-page');
 const generateSingleReplacement = document.getElementById('generate-single-replacement');
@@ -821,7 +779,7 @@ function restoreProgress() {
     document.getElementById('generated-story-title').textContent = saved.title || document.getElementById('generated-story-title').textContent;
     document.getElementById('generated-story-heading').textContent = saved.title || document.getElementById('generated-story-heading').textContent;
     document.getElementById('generated-story-text').textContent = saved.story || document.getElementById('generated-story-text').textContent;
-    coverDirection.value = saved.direction || coverDirection.value;
+    coverDirection.value = saved.direction || buildIllustrationDirection();
     const cartoon = localStorage.getItem(cacheKeys.cartoon);
     const artwork = localStorage.getItem(cacheKeys.artwork);
     if (saved.selectedStyle === 'custom' && cartoon) {
