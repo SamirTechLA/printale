@@ -118,7 +118,11 @@ function peechoConfig() {
 async function peechoRequest(config, path, body) {
   const response = await fetch(`${config.apiBase}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(String(data?.message || data?.error?.message || data?.error || `Peecho request failed (${response.status}).`).slice(0, 300));
+  if (!response.ok) {
+    const detail = String(data?.message || data?.error?.message || data?.error || data?.custom_code || '').replace(/[\r\n]+/g, ' ').slice(0, 300);
+    console.error(`Peecho ${path} failed (${response.status})${detail ? `: ${detail}` : ''}`);
+    throw new Error(`Peecho ${path} failed (${response.status})${detail ? `: ${detail}` : '. Check the offering ID, selected page count, trim size, and public PDF URL.'}`);
+  }
   return data;
 }
 
