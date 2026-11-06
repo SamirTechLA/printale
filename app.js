@@ -84,7 +84,7 @@ const websiteCopySelectors = [
   '.proof-strip p', '.intro .section-label', '.intro h2', '.step-card h3', '.step-card p',
   '.featured-story .eyebrow', '.featured-story h2', '.featured-story p', '.story-meta span', '.featured-story a',
   '.studio-heading .section-label', '.studio-heading h2', '.studio-heading p', '.progress-item b', '.progress-item small',
-  '[data-panel="1"] .panel-kicker', '[data-panel="1"] h3', '[data-panel="1"] .panel-intro', '[data-panel="1"] .photo-studio-copy b', '[data-panel="1"] .photo-studio-copy small', '[data-panel="1"] .hero-name-field > span', '[data-panel="1"] .photo-picker', '[data-panel="1"] #create-cartoon-demo', '[data-panel="1"] #reset-hero', '[data-panel="1"] .photo-consent b', '[data-panel="1"] .photo-consent small', '[data-panel="1"] .friend-row b', '[data-panel="1"] .friend-row small', '[data-panel="1"] #friend-toggle',
+  '[data-panel="1"] .panel-kicker', '[data-panel="1"] h3', '[data-panel="1"] .panel-intro', '[data-panel="1"] .photo-studio-copy b', '[data-panel="1"] .photo-studio-copy small', '[data-panel="1"] .hero-name-field > span', '[data-panel="1"] .photo-picker', '[data-panel="1"] #reset-hero', '[data-panel="1"] .photo-consent b', '[data-panel="1"] .photo-consent small', '[data-panel="1"] .friend-row b', '[data-panel="1"] .friend-row small', '[data-panel="1"] #friend-toggle',
   '[data-panel="2"] .panel-kicker', '[data-panel="2"] h3', '[data-panel="2"] .panel-intro', '[data-panel="2"] h4', '[data-panel="2"] .voice-story-copy p', '[data-panel="2"] #start-story-voice', '[data-panel="2"] .voice-upload-button', '[data-panel="2"] .voice-parent-consent span', '[data-panel="2"] .back-button', '[data-panel="2"] #see-story',
   '[data-panel="3"] .panel-kicker', '[data-panel="3"] .parent-approved', '[data-panel="3"] .parent-preview-intro > p', '[data-panel="3"] .edit-hero-button', '[data-panel="3"] .chapter', '[data-panel="3"] #cover-art-title', '[data-panel="3"] .cover-art-studio p', '[data-panel="3"] #generate-cover-art', '[data-panel="3"] #generate-full-proof', '[data-panel="3"] .preview-controls > span', '[data-panel="3"] #next-spread', '[data-panel="3"] .coloring-callout b', '[data-panel="3"] .coloring-callout small', '[data-panel="3"] #show-coloring', '[data-panel="3"] .back-button', '[data-panel="3"] .open-book-proof-now', '[data-panel="3"] .next-button',
   '[data-panel="4"] .panel-kicker', '[data-panel="4"] > h3', '[data-panel="4"] > p', '[data-panel="4"] .chapter', '[data-panel="4"] #print-preview-title', '[data-panel="4"] .print-preview-head > span', '[data-panel="4"] #art-cost-title', '[data-panel="4"] .art-cost-control p', '[data-panel="4"] label', '[data-panel="4"] #replacement-page option', '[data-panel="4"] #generate-single-replacement', '[data-panel="4"] #replacement-status', '[data-panel="4"] #rebuild-full-proof', '[data-panel="4"] .open-book-preview', '[data-panel="4"] .print-book-preview > p', '[data-panel="4"] .handoff-summary h4', '[data-panel="4"] .handoff-summary > div span', '[data-panel="4"] .handoff-summary > div b', '[data-panel="4"] .handoff-summary p', '[data-panel="4"] .safe-handoff p', '[data-panel="4"] #print-route-title', '[data-panel="4"] #print-route-copy', '[data-panel="4"] #print-route-note', '[data-panel="4"] #print-provider option', '[data-panel="4"] #prepare-parent-proof', '[data-panel="4"] #prepare-print-package', '[data-panel="4"] #print-route-status', '[data-panel="4"] .back-button', '[data-panel="4"] #start-new-story', '[data-panel="4"] #complete-demo',
@@ -210,7 +210,6 @@ document.getElementById('friend-toggle').addEventListener('click', (event) => {
   event.currentTarget.style.color = state.friend ? '#32876c' : '';
 });
 const photoUpload = document.getElementById('photo-upload');
-const photoDemoButton = document.getElementById('create-cartoon-demo');
 const photoDemoResult = document.getElementById('photo-demo-result');
 const sourcePhotoPreview = document.getElementById('source-photo-preview');
 const photoConsentRow = document.getElementById('photo-consent-row');
@@ -221,6 +220,7 @@ const customAvatarPhoto = document.getElementById('custom-avatar-photo');
 const customAvatarName = document.getElementById('custom-avatar-name');
 const photoCartoonStatus = document.getElementById('photo-cartoon-status');
 const demoResultAvatar = document.getElementById('demo-result-avatar');
+let cartoonCreationInFlight = false;
 function selectAvatar(choice) {
   document.querySelectorAll('.avatar-choice').forEach((item) => { item.classList.remove('selected'); item.setAttribute('aria-checked', 'false'); });
   choice.classList.add('selected'); choice.setAttribute('aria-checked', 'true'); state.name = choice.dataset.name; updateName();
@@ -249,13 +249,15 @@ photoUpload.addEventListener('change', () => {
   selectAvatar(customAvatarChoice);
   photoConsentRow.hidden = false;
   photoConsent.checked = false;
-  photoDemoButton.disabled = true;
-  photoDemoButton.textContent = 'Approve to create cartoon';
+  photoConsent.disabled = false;
   photoCartoonStatus.textContent = 'Your photo stays in this browser until you approve the one-time cartoon request.';
 });
 photoConsent.addEventListener('change', () => {
-  photoDemoButton.disabled = !photoConsent.checked;
-  photoDemoButton.textContent = photoConsent.checked ? 'Create cartoon hero →' : 'Approve to create cartoon';
+  if (!photoConsent.checked) {
+    photoCartoonStatus.textContent = 'Cartoon creation is waiting for parent approval.';
+    return;
+  }
+  createCartoonHero();
 });
 function readAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -284,11 +286,12 @@ async function prepareCartoonPhoto(file) {
   canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL('image/jpeg', 0.86);
 }
-photoDemoButton.addEventListener('click', async () => {
+async function createCartoonHero() {
   const [photo] = photoUpload.files;
-  if (!photo || !photoConsent.checked) return;
-  photoDemoButton.disabled = true;
-  photoDemoButton.textContent = 'Creating cartoon hero…';
+  if (!photo || !photoConsent.checked || cartoonCreationInFlight) return;
+  cartoonCreationInFlight = true;
+  photoConsent.disabled = true;
+  photoUpload.disabled = true;
   photoCartoonStatus.textContent = 'Creating the approved cartoon hero…';
   try {
     const image = await prepareCartoonPhoto(photo);
@@ -303,14 +306,15 @@ photoDemoButton.addEventListener('click', async () => {
     selectAvatar(customAvatarChoice);
     photoDemoResult.hidden = false;
     photoCartoonStatus.textContent = 'Cartoon hero ready. This is the version used in the cover and story preview.';
-    photoDemoButton.textContent = 'Cartoon hero ready ✓';
     saveProgress();
   } catch (error) {
-    photoCartoonStatus.textContent = error.message || 'Cartoon creation could not start.';
-    photoDemoButton.disabled = false;
-    photoDemoButton.textContent = 'Create cartoon hero →';
+    photoCartoonStatus.textContent = `${error.message || 'Cartoon creation could not start.'} Uncheck and approve again to retry.`;
+    photoConsent.disabled = false;
+    photoUpload.disabled = false;
+  } finally {
+    cartoonCreationInFlight = false;
   }
-});
+}
 document.getElementById('reset-hero').addEventListener('click', () => {
   if (sourcePhotoPreview.src.startsWith('blob:')) URL.revokeObjectURL(sourcePhotoPreview.src);
   photoUpload.value = '';
@@ -322,8 +326,9 @@ document.getElementById('reset-hero').addEventListener('click', () => {
   photoDemoResult.hidden = true;
   photoConsentRow.hidden = true;
   photoConsent.checked = false;
-  photoDemoButton.disabled = true;
-  photoDemoButton.textContent = 'Create cartoon hero →';
+  photoConsent.disabled = false;
+  photoUpload.disabled = false;
+  cartoonCreationInFlight = false;
   photoCartoonStatus.textContent = 'Hero reset. Choose a photo when you are ready.';
   localStorage.removeItem(cacheKeys.cartoon);
   localStorage.removeItem(cacheKeys.artwork);
