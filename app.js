@@ -189,6 +189,7 @@ document.querySelectorAll('[data-next]').forEach((button) => button.addEventList
   button.disabled = true;
   button.textContent = 'Creating story & illustrations…';
   status.textContent = 'Creating a child-safe story and its illustrations…';
+  setArtGenerationLock(0, 'Creating your story…', 'Writing the story and preparing 7 illustrations. Please keep this page open.');
   fetch('/api/generate-story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idea: storyIdea, heroName: state.name, language: state.language }) })
     .then(async (response) => {
       const result = await response.json();
@@ -204,7 +205,7 @@ document.querySelectorAll('[data-next]').forEach((button) => button.addEventList
       await createFullProof();
     })
     .catch((error) => { status.textContent = error.message || 'Story generation could not start.'; })
-    .finally(() => { button.disabled = false; button.innerHTML = 'Create their story <span>→</span>'; });
+    .finally(() => { clearArtGenerationLock(); button.disabled = false; button.innerHTML = 'Create their story <span>→</span>'; updateStoryCreationAvailability(); });
 }));
 document.querySelectorAll('[data-back]').forEach((button) => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
 document.getElementById('friend-toggle').addEventListener('click', (event) => {
@@ -344,6 +345,8 @@ const voiceStoryButton = document.getElementById('start-story-voice');
 const voiceStoryIdea = document.getElementById('voice-story-idea');
 const voiceStoryStatus = document.getElementById('voice-story-status');
 const voiceParentConsent = document.getElementById('voice-parent-consent');
+const voiceConsent = document.getElementById('voice-consent');
+const seeStoryButton = document.getElementById('see-story');
 const storyIdeaPreview = document.getElementById('story-idea-preview');
 const storyIdeaText = document.getElementById('story-idea-text');
 const voiceAudioUpload = document.getElementById('voice-audio-upload');
@@ -353,10 +356,19 @@ let voiceCaptureHadResult = false;
 function updateStoryIdea() {
   const idea = voiceStoryIdea.value.trim();
   voiceParentConsent.hidden = !idea;
+  if (!idea) voiceConsent.checked = false;
   storyIdeaPreview.hidden = !idea;
   storyIdeaText.textContent = idea;
+  updateStoryCreationAvailability();
 }
-voiceStoryIdea.addEventListener('input', updateStoryIdea);
+function updateStoryCreationAvailability() {
+  seeStoryButton.disabled = !voiceStoryIdea.value.trim() || !voiceConsent.checked;
+}
+voiceStoryIdea.addEventListener('input', () => {
+  voiceConsent.checked = false;
+  updateStoryIdea();
+});
+voiceConsent.addEventListener('change', updateStoryCreationAvailability);
 voiceAudioUpload.addEventListener('change', () => {
   const [audio] = voiceAudioUpload.files;
   if (!audio) return;
