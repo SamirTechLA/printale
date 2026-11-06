@@ -4,11 +4,14 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
 
 payload = json.load(sys.stdin)
 out = payload['output']
 os.makedirs(os.path.dirname(out), exist_ok=True)
-book = canvas.Canvas(out, pagesize=(576, 576))
+page_width = float(payload.get('pageWidthMm', 203.2)) * mm
+page_height = float(payload.get('pageHeightMm', 203.2)) * mm
+book = canvas.Canvas(out, pagesize=(page_width, page_height))
 book.setTitle(payload.get('title', 'PrinTale parent proof'))
 navy, cream, coral = HexColor('#173452'), HexColor('#fffaf0'), HexColor('#f27c6e')
 font_dirs = [os.environ.get('PRINTALE_FONT_DIR', ''), r'C:\Windows\Fonts', '/usr/share/fonts/ttf-dejavu', '/usr/share/fonts/TTF']
@@ -100,4 +103,6 @@ for n in range(4):
     cover(f'{n * 2 + 4:02d} · THE ADVENTURE', title, chunks[n + 1], '')
 art_page(payload.get('coloring', ''))
 cover('12 · BACK COVER', 'The end - and the next adventure', 'A PrinTale keepsake for ' + hero, scenes[5] if len(scenes)>5 else '')
+for number in range(13, max(13, int(payload.get('pageCount', 12)) + 1)):
+    cover(f'{number:02d} · PRIN TALE', 'A new adventure is waiting', 'This page completes the selected print format.', '')
 book.save()

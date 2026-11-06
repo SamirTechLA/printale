@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { spawn } from 'node:child_process';
-import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 
 const port = Number(process.env.PORT || 4173);
 const root = process.cwd();
@@ -57,7 +57,10 @@ function grantPreviewAccess(request, response) {
 function peechoSetupStatus() {
   const missing = [];
   if (!process.env.PEECHO_API_KEY) missing.push('a private Peecho API key');
+  if (!process.env.PEECHO_SECRET_KEY) missing.push('a private Peecho secret key for signed webhooks');
+  if (!process.env.PEECHO_OFFERING_ID) missing.push('a Peecho book offering ID');
   if (!process.env.PEECHO_PUBLIC_FILE_BASE_URL) missing.push('a public HTTPS file address');
+  if (process.env.PEECHO_ENV === 'production' && process.env.PEECHO_PRODUCTION_READY !== 'yes') missing.push('PEECHO_PRODUCTION_READY=yes after final print validation');
   return {
     ready: missing.length === 0,
     missing,
@@ -66,9 +69,11 @@ function peechoSetupStatus() {
   };
 }
 
-function createParentProof(payload) {
+function createPdf(payload, directory, options = {}) {
   const id = randomUUID();
-  const output = join(root, 'outputs', 'print-proofs', `${id}.pdf`);
+  const token = randomBytes(24).toString('base64url');
+  const fileName = options.publicFile ? `${id}-${token}.pdf` : `${id}.pdf`;
+  const output = join(root, 'outputs', directory, fileName);
   const python = process.env.STORYSPARK_PYTHON || (process.platform === 'win32'
     ? 'C:\\Users\\sciampa\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe'
     : 'python3');
@@ -79,9 +84,62 @@ function createParentProof(payload) {
     let errors = '';
     child.stderr.on('data', (chunk) => { errors += chunk; });
     child.on('error', reject);
-    child.on('close', (code) => code === 0 ? resolve(`/outputs/print-proofs/${id}.pdf`) : reject(new Error(errors || 'The parent PDF proof could not be created.')));
-    child.stdin.end(JSON.stringify({ ...payload, output }));
+    child.on('close', (code) => code === 0 ? resolve({
+      path: `/outputs/${directory}/${fileName}`,
+      output,
+    }) : reject(new Error(errors || 'The PDF could not be created.')));
+    child.stdin.end(JSON.stringify({ ...payload, ...options, output }));
   });
+}
+
+function createParentProof(payload) { return createPdf(payload, 'print-proofs'); }
+
+function peechoConfig() {
+  const setup = peechoSetupStatus();
+  if (!setup.ready) throw new Error(`Peecho is not ready: ${setup.missing.join(', ')}.`);
+  const environment = setup.environment;
+  const publicBaseUrl = String(process.env.PEECHO_PUBLIC_FILE_BASE_URL || '').replace(/\/$/, '');
+  if (!publicBaseUrl.startsWith('https://')) throw new Error('PEECHO_PUBLIC_FILE_BASE_URL must use HTTPS.');
+  return {
+    environment,
+    apiBase: environment === 'production' ? 'https://www.peecho.com/rest/v3' : 'https://test.www.peecho.com/rest/v3',
+    checkoutBase: environment === 'production' ? 'https://www.peecho.com' : 'https://test.www.peecho.com',
+    key: process.env.PEECHO_API_KEY,
+    publicBaseUrl,
+    offeringId: String(process.env.PEECHO_OFFERING_ID),
+    currency: String(process.env.PEECHO_CURRENCY || 'EUR').toUpperCase(),
+    locale: String(process.env.PEECHO_CHECKOUT_LOCALE || 'en').toLowerCase(),
+    width: Number(process.env.PEECHO_BOOK_WIDTH_MM || 210),
+    height: Number(process.env.PEECHO_BOOK_HEIGHT_MM || 210),
+    pages: Number(process.env.PEECHO_BOOK_PAGE_COUNT || 20),
+  };
+}
+
+async function peechoRequest(config, path, body) {
+  const response = await fetch(`${config.apiBase}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(String(data?.message || data?.error?.message || data?.error || `Peecho request failed (${response.status}).`).slice(0, 300));
+  return data;
+}
+
+async function createPeechoCheckout(payload) {
+  const config = peechoConfig();
+  if (!Number.isFinite(config.width) || !Number.isFinite(config.height) || !Number.isInteger(config.pages) || config.pages < 20) throw new Error('Set a valid Peecho book size and page count (at least 20 pages) in .env.');
+  const pdf = await createPdf(payload, 'peecho', { publicFile: true, pageWidthMm: config.width, pageHeightMm: config.height, pageCount: config.pages, productionFile: true });
+  const sourceUrl = `${config.publicBaseUrl}${pdf.path}`;
+  const reference = `printale-${randomUUID()}`;
+  const publication = await peechoRequest(config, '/publication/create', {
+    apiKey: config.key,
+    currency: config.currency,
+    locale: config.locale,
+    fixedOfferingId: config.offeringId,
+    enableSecureCheckout: true,
+    order: { reference, product: { title: payload.title, source: { file: { src: sourceUrl, pages: config.pages, dimensions: { width: config.width, height: config.height } } } } },
+  });
+  const secureId = publication.secure_publication_id || publication.securePublicationId;
+  const checkoutToken = publication.token;
+  if (!secureId || !checkoutToken) throw new Error('Peecho did not return a secure checkout link. Confirm secure checkout is enabled for this account.');
+  return { checkoutUrl: `${config.checkoutBase}/checkout/print/${config.locale}/${encodeURIComponent(secureId)}?token=${encodeURIComponent(checkoutToken)}`, reference, environment: config.environment };
 }
 
 function extractText(apiResponse) {
@@ -227,10 +285,48 @@ async function createCartoonHero(imageDataUrl) {
 createServer(async (request, response) => {
   const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
   const privateStudioRequest = url.pathname === '/preview' || url.pathname === '/index.html';
-  const protectedApiRequest = url.pathname.startsWith('/api/') || url.pathname.startsWith('/outputs/');
+  const peechoWebhookRequest = url.pathname === '/api/peecho/webhook';
+  const publicPeechoFileRequest = url.pathname.startsWith('/outputs/peecho/');
+  const protectedApiRequest = (url.pathname.startsWith('/api/') && !peechoWebhookRequest) || (url.pathname.startsWith('/outputs/') && !publicPeechoFileRequest);
   if (teaserMode && (privateStudioRequest || protectedApiRequest) && !grantPreviewAccess(request, response)) return;
+  if (request.method === 'POST' && peechoWebhookRequest) {
+    let body = '';
+    request.on('data', (chunk) => { body += chunk; if (body.length > 64 * 1024) request.destroy(); });
+    request.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        const orderId = String(payload.order_id || '');
+        const signature = String(payload.signature || '');
+        const secret = String(process.env.PEECHO_SECRET_KEY || '');
+        const expected = secret && orderId ? createHash('sha256').update(`${secret}${orderId}`).digest('hex') : '';
+        if (!hasMatchingValue(signature, expected)) return sendJson(response, 401, { error: 'Invalid webhook signature.' });
+        console.log(`Peecho order ${orderId}: ${payload.old_status || 'unknown'} -> ${payload.new_status || 'unknown'}`);
+        return sendJson(response, 200, { received: true });
+      } catch { return sendJson(response, 400, { error: 'Invalid webhook payload.' }); }
+    });
+    return;
+  }
   if (request.method === 'GET' && url.pathname === '/api/peecho/status') {
     return sendJson(response, 200, peechoSetupStatus());
+  }
+  if (request.method === 'POST' && url.pathname === '/api/peecho/checkout') {
+    let body = '';
+    let tooLarge = false;
+    request.on('data', (chunk) => { body += chunk; if (body.length > 45 * 1024 * 1024) tooLarge = true; });
+    request.on('end', async () => {
+      try {
+        if (tooLarge) return sendJson(response, 413, { error: 'This book has too much artwork for a print handoff.' });
+        const payload = JSON.parse(body);
+        const title = String(payload.title || '').trim().slice(0, 90);
+        const hero = String(payload.hero || '').trim().slice(0, 60);
+        const story = String(payload.story || '').trim().slice(0, 1500);
+        const scenes = Array.isArray(payload.scenes) ? payload.scenes.slice(0, 6).map((value) => String(value || '')) : [];
+        const coloring = String(payload.coloring || '');
+        if (!title || !story || scenes.length < 6 || !coloring) return sendJson(response, 400, { error: 'Finish and approve the complete illustrated book before creating checkout.' });
+        sendJson(response, 200, await createPeechoCheckout({ title, hero, story, scenes, coloring }));
+      } catch (error) { sendJson(response, 502, { error: error instanceof Error ? error.message : 'Peecho checkout could not be created.' }); }
+    });
+    return;
   }
   if (request.method === 'POST' && url.pathname === '/api/generate-story') {
     let body = '';
@@ -315,7 +411,8 @@ createServer(async (request, response) => {
         if (!title || !story) return sendJson(response, 400, { error: 'Finish the story draft before creating a parent proof.' });
         const scenes = Array.isArray(payload.scenes) ? payload.scenes.slice(0, 6).map((value) => String(value || '')) : [];
         const coloring = String(payload.coloring || '');
-        sendJson(response, 200, { url: await createParentProof({ title, hero, story, scenes, coloring }) });
+        const proof = await createParentProof({ title, hero, story, scenes, coloring });
+        sendJson(response, 200, { url: proof.path });
       } catch (error) { sendJson(response, 502, { error: error instanceof Error ? error.message : 'The parent PDF proof could not be created.' }); }
     });
     return;

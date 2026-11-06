@@ -690,6 +690,8 @@ const printRouteNote = document.getElementById('print-route-note');
 const printRouteStatus = document.getElementById('print-route-status');
 function updatePrintRoute() {
   const peecho = printProvider.value === 'peecho';
+  const peechoCheckoutButton = document.getElementById('open-peecho-checkout');
+  const peechoCheckoutLink = document.getElementById('peecho-checkout-link');
   printRouteCopy.textContent = peecho
     ? 'Peecho is the direct print-on-demand route for a parent-approved personalized book.'
     : 'Amazon KDP is for a separate, manually published retail edition - it is not the parent checkout route.';
@@ -697,8 +699,10 @@ function updatePrintRoute() {
     ? 'Peecho collects payment and delivery details in its own secure checkout. PrinTale does not collect card or address details.'
     : 'PrinTale can prepare a print-ready package for manual KDP upload. It cannot automatically submit to KDP.';
   document.getElementById('prepare-print-package').textContent = peecho
-    ? 'Check Peecho checkout setup'
+    ? 'Check Peecho sandbox setup'
     : 'Prepare KDP handoff';
+  peechoCheckoutButton.hidden = !peecho;
+  if (!peecho) peechoCheckoutLink.hidden = true;
   localStorage.setItem('storyspark-print-provider', printProvider.value);
 }
 printProvider.value = localStorage.getItem('storyspark-print-provider') || 'peecho';
@@ -722,6 +726,29 @@ document.getElementById('prepare-print-package').addEventListener('click', async
   } else {
     printRouteStatus.textContent = 'KDP export is selected. The next build creates a print-ready PDF and metadata package for manual KDP upload - no book is submitted automatically.';
   }
+});
+document.getElementById('open-peecho-checkout').addEventListener('click', async () => {
+  const button = document.getElementById('open-peecho-checkout');
+  const link = document.getElementById('peecho-checkout-link');
+  const title = document.getElementById('generated-story-title').textContent;
+  const story = document.getElementById('generated-story-text').textContent;
+  if (bookSceneArt.length < 6 || !coloringSceneArt) {
+    printRouteStatus.textContent = 'Finish the full illustrated book before opening Peecho checkout.';
+    return;
+  }
+  button.disabled = true;
+  printRouteStatus.textContent = 'Creating a secure Peecho sandbox checkout…';
+  try {
+    const response = await fetch('/api/peecho/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, hero: state.name, story, scenes: bookSceneArt, coloring: coloringSceneArt }) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Peecho checkout could not be created.');
+    link.href = result.checkoutUrl;
+    link.hidden = false;
+    printRouteStatus.textContent = `Secure Peecho ${result.environment} checkout is ready. Payment and delivery stay on Peecho.`;
+    window.open(result.checkoutUrl, '_blank', 'noopener');
+  } catch (error) {
+    printRouteStatus.textContent = error.message || 'Peecho checkout could not be created.';
+  } finally { button.disabled = false; }
 });
 document.getElementById('prepare-parent-proof').addEventListener('click', async () => {
   const button = document.getElementById('prepare-parent-proof');
