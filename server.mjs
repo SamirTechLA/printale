@@ -126,6 +126,34 @@ async function peechoRequest(config, path, body) {
   return data;
 }
 
+async function peechoOfferingCheck() {
+  const config = peechoConfig();
+  const query = new URLSearchParams({ merchantApiKey: config.key, currency: config.currency });
+  const response = await fetch(`${config.apiBase}/offering/list?${query}`);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(`Peecho offering lookup failed (${response.status}). Check that this is a valid ${config.environment} API key.`);
+  const offerings = [];
+  const visit = (value) => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) { value.forEach(visit); return; }
+    if (value.id !== undefined && value.name) offerings.push(value);
+    Object.values(value).forEach(visit);
+  };
+  visit(data);
+  const offering = offerings.find((item) => String(item.id) === config.offeringId);
+  if (!offering) throw new Error(`Offering ID ${config.offeringId} is not active for this Peecho ${config.environment} account.`);
+  const minPages = Number(offering.minNumberOfPages || 0);
+  const maxPages = Number(offering.maxNumberOfPages || Infinity);
+  if (config.pages < minPages || config.pages > maxPages) throw new Error(`${offering.name} supports ${minPages}–${maxPages} pages, but PrinTale is configured for ${config.pages}.`);
+  const width = Number(offering.dimensionWidth || 0);
+  const height = Number(offering.dimensionHeight || 0);
+  const dynamic = Boolean(offering.dynamicSize);
+  if (!dynamic && width && height && (Math.round(width) !== Math.round(config.width) || Math.round(height) !== Math.round(config.height))) {
+    throw new Error(`${offering.name} requires ${width} × ${height} mm, but PrinTale is configured for ${config.width} × ${config.height} mm.`);
+  }
+  return { ready: true, offering: { id: offering.id, name: offering.name, minPages, maxPages, width, height, dynamic } };
+}
+
 async function createPeechoCheckout(payload) {
   const config = peechoConfig();
   if (!Number.isFinite(config.width) || !Number.isFinite(config.height) || !Number.isInteger(config.pages) || config.pages < 20) throw new Error('Set a valid Peecho book size and page count (at least 20 pages) in .env.');
@@ -312,6 +340,10 @@ createServer(async (request, response) => {
   }
   if (request.method === 'GET' && url.pathname === '/api/peecho/status') {
     return sendJson(response, 200, peechoSetupStatus());
+  }
+  if (request.method === 'GET' && url.pathname === '/api/peecho/validate') {
+    try { return sendJson(response, 200, await peechoOfferingCheck()); }
+    catch (error) { return sendJson(response, 400, { error: error instanceof Error ? error.message : 'Peecho offering validation failed.' }); }
   }
   if (request.method === 'POST' && url.pathname === '/api/peecho/checkout') {
     let body = '';

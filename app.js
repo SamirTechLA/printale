@@ -717,9 +717,15 @@ document.getElementById('prepare-print-package').addEventListener('click', async
       const response = await fetch('/api/peecho/status');
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Peecho setup could not be checked.');
-      printRouteStatus.textContent = result.ready
-        ? 'Peecho is configured. The next production step is generating a high-resolution, product-specific print PDF before opening secure checkout.'
-        : `Peecho is not connected yet: ${result.missing.join(' and ')}. No customer information or payment is collected in PrinTale.`;
+      if (!result.ready) {
+        printRouteStatus.textContent = `Peecho is not connected yet: ${result.missing.join(' and ')}. No customer information or payment is collected in PrinTale.`;
+        return;
+      }
+      const validationResponse = await fetch('/api/peecho/validate');
+      const validation = await validationResponse.json();
+      if (!validationResponse.ok) throw new Error(validation.error || 'Peecho offering validation failed.');
+      const offering = validation.offering;
+      printRouteStatus.textContent = `Sandbox ready: ${offering.name} (${offering.width} × ${offering.height} mm, ${offering.minPages}–${offering.maxPages} pages). You can open secure checkout.`;
     } catch (error) {
       printRouteStatus.textContent = error.message || 'Peecho setup could not be checked.';
     } finally { button.disabled = false; }
